@@ -44,7 +44,7 @@ CATALOG = [
         "name": "Місяць звичайний білий",
         "price": 550,
         "photos": ["moon_white.jpg"],
-    },/
+    },
     {
         "id": "prod4",
         "name": "Фоторамка",
