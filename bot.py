@@ -1,11 +1,9 @@
 # bot.py
 import os
-from dotenv import load_dotenv
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
 import asyncio
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import CommandStart, Command
@@ -23,8 +21,10 @@ from PIL import Image, ImageOps  # Pillow для підготовки фото
 # -----------------------
 # Налаштування / Дані
 # -----------------------
+load_dotenv()
 
 CONTACT_TEXT = "Зв'язок: @stEgno_lamps"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 CATALOG = [
     {
