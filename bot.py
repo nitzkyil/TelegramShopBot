@@ -43,7 +43,7 @@ CATALOG = [
         "id": "prod3",
         "name": "Місяць звичайний білий",
         "price": 550,
-        "photos": ["moon_white.jpg"],
+        "photos": ["moon_white_1.jpg", "moon_white_2.jpg"],
     },
     {
         "id": "prod4",
