@@ -3,7 +3,6 @@ import os
 import asyncio
 import logging
 from pathlib import Path
-from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, F, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import CommandStart, Command
@@ -16,22 +15,26 @@ from aiogram.types import (
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import Router
-from PIL import Image, ImageOps  # Pillow для підготовки фото
+from PIL import Image, ImageOps
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer  # для Render keep_alive
 
 # -----------------------
-# Налаштування / Дані
+# Налаштування
 # -----------------------
-load_dotenv()
 
 CONTACT_TEXT = "Зв'язок: @stEgno_lamps"
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("❌ BOT_TOKEN не знайдено! Додай його у Variables на сайті Railway або Render.")
 
 CATALOG = [
     {
         "id": "prod1",
         "name": "Місяць фосфорисцентний (світиться в темряві) зелений",
         "price": 600,
-        "photos": [""],
+        "photos": ["images/moon_green.jpg", "images/moon_green_2.jpg"],
     },
     {
         "id": "prod2",
@@ -49,7 +52,7 @@ CATALOG = [
         "id": "prod4",
         "name": "Фоторамка",
         "price": "ціна договірна",
-        "photos": [""],
+        "photos": ["images/20250916_213350.jpg"],
     },
 ]
 
@@ -86,7 +89,6 @@ def catalog_kb():
     return kb.as_markup()
 
 def photo_nav_kb(prod_id: str, current_idx: int, total: int):
-    """Кнопки навігації по фото ◀ i/N ▶ + назад у каталог"""
     prev_idx = (current_idx - 1) % total
     next_idx = (current_idx + 1) % total
     kb = InlineKeyboardBuilder()
@@ -132,7 +134,7 @@ def resolve_photo_source(photo_field: str):
     p = (BASE_DIR / Path(photo_field)).resolve()
     if p.exists() and p.is_file():
         return prepare_photo_for_telegram(p)
-    return photo_field  # URL або file_id
+    return photo_field
 
 def get_product(prod_id: str):
     return next((p for p in CATALOG if p["id"] == prod_id), None)
@@ -161,7 +163,6 @@ async def on_catalog(callback: types.CallbackQuery):
 
 @router.callback_query(F.data.startswith("show:"))
 async def on_show_product(callback: types.CallbackQuery):
-    """Показ першого фото товару (idx=0) — без автоповернення каталогу."""
     prod_id = callback.data.split(":", 1)[1]
     product = get_product(prod_id)
     if not product:
@@ -187,12 +188,10 @@ async def on_show_product(callback: types.CallbackQuery):
             await callback.message.answer(text, reply_markup=photo_nav_kb(prod_id, 0, len(photos)))
     else:
         await callback.message.answer(text)
-
     await callback.answer()
 
 @router.callback_query(F.data.startswith("p:"))
 async def on_photo_nav(callback: types.CallbackQuery):
-    """Перемикання фото у товарі (редагує те саме повідомлення)."""
     try:
         _, prod_id, idx_str = callback.data.split(":")
         target_idx = int(idx_str)
@@ -219,21 +218,14 @@ async def on_photo_nav(callback: types.CallbackQuery):
     try:
         photo_obj = resolve_photo_source(photos[target_idx])
         media = InputMediaPhoto(media=photo_obj, caption=text, parse_mode="HTML")
-        await callback.message.edit_media(
-            media=media,
-            reply_markup=photo_nav_kb(prod_id, target_idx, total),
-        )
+        await callback.message.edit_media(media=media, reply_markup=photo_nav_kb(prod_id, target_idx, total))
     except Exception as e:
         logging.exception(f"Не вдалось перемкнути фото для '{name}': {e}")
-        try:
-            await callback.message.answer_photo(
-                photo=resolve_photo_source(photos[target_idx]),
-                caption=text,
-                reply_markup=photo_nav_kb(prod_id, target_idx, total),
-            )
-        except Exception as e2:
-            logging.exception(f"Повторна спроба теж не вдалася: {e2}")
-            await callback.message.answer(text, reply_markup=photo_nav_kb(prod_id, target_idx, total))
+        await callback.message.answer_photo(
+            photo=resolve_photo_source(photos[target_idx]),
+            caption=text,
+            reply_markup=photo_nav_kb(prod_id, target_idx, total),
+        )
 
     await callback.answer(f"Фото {target_idx+1}/{total}")
 
@@ -242,10 +234,26 @@ async def on_any_message(message: Message):
     await message.answer("Оберіть дію 👇", reply_markup=main_menu())
 
 # -----------------------
+# Keep-alive для Render
+# -----------------------
+
+def keep_alive():
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Bot is running")
+
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), Handler)
+    threading.Thread(target=server.serve_forever).start()
+
+# -----------------------
 # Запуск
 # -----------------------
 
 async def main():
+    keep_alive()  # <-- для Render Free plan, не впливає на Railway
     await bot.set_my_commands([
         BotCommand(command="start", description="Почати"),
         BotCommand(command="catalog", description="Показати каталог"),
