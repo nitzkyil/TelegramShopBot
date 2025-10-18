@@ -40,13 +40,13 @@ CATALOG = [
         "id": "prod2",
         "name": "Місяць фосфорисцентний (світиться в темряві) синій",
         "price": 600,
-        "photos": ["https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_blue_1.jpg", "https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_blue_2.jpg"],
+        "photos": ["https://raw.githubusercontent.com/nitzkyil/TelegramShopBot/main/images/moon_blue_1.jpg", "https://raw.githubusercontent.com/nitzkyil/TelegramShopBot/main/images/moon_blue_2.jpg"],
     },
     {
         "id": "prod3",
         "name": "Місяць звичайний білий",
         "price": 550,
-        "photos": ["https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_white_1.jpg", "https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_white_2.jpg"],
+        "photos": ["https://raw.githubusercontent.com/nitzkyil/TelegramShopBot/main/images/moon_white_1.jpg", "https://raw.githubusercontent.com/nitzkyil/TelegramShopBot/main/images/moon_white_2.jpg"],
     },
     {
         "id": "prod4",
