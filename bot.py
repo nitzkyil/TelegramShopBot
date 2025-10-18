@@ -34,25 +34,25 @@ CATALOG = [
         "id": "prod1",
         "name": "Місяць фосфорисцентний (світиться в темряві) зелений",
         "price": 600,
-        "photos": ["images/moon_green.jpg", "images/moon_green_2.jpg"],
+        "photos": [""],
     },
     {
         "id": "prod2",
         "name": "Місяць фосфорисцентний (світиться в темряві) синій",
         "price": 600,
-        "photos": ["images/moon_blue_1.jpg", "images/moon_blue_2.jpg"],
+        "photos": ["https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_blue_1.jpg", "https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_blue_2.jpg"],
     },
     {
         "id": "prod3",
         "name": "Місяць звичайний білий",
         "price": 550,
-        "photos": ["images/moon_white_1.jpg", "images/moon_white_2.jpg"],
+        "photos": ["https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_white_1.jpg", "https://github.com/nitzkyil/TelegramShopBot/blob/main/images/moon_white_2.jpg"],
     },
     {
         "id": "prod4",
         "name": "Фоторамка",
         "price": "ціна договірна",
-        "photos": ["images/20250916_213350.jpg"],
+        "photos": [""],
     },
 ]
 
